@@ -17,6 +17,6 @@ typedef struct
 
 int checkUser(void);
 void accountConfig(void);
-
+int checkPass(char * command);
 
 #endif

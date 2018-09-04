@@ -18,6 +18,12 @@ Account g_Account;
 
 typedef struct 
 {
+	char ability[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE];
+	int count;
+}Ability;
+
+typedef struct 
+{
 	char comStr[LOGIN_MIN_SIZE];
 	char abiStr[LOGIN_MIN_SIZE];
 }Relation;
@@ -30,6 +36,7 @@ Relation relation[] = {
 	{"chg","write"},
 	{"add","create"},
 	{"del","delete"},
+	{ "list","write" },
 	{"q","list"},
 };
 
@@ -49,15 +56,9 @@ typedef struct
 	void (*p)(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE]);
 }LoginCommand;
 
-
-
 const char db_path[]={"userLog.db"};
 
-
-
 static SqQueue *g_pLogQueue;
-
-
 
 static int zMaxId(void *notUse,int argc,char** argv,char** azColName)
 {
@@ -211,9 +212,6 @@ const LoginCommand loginCom[]={
 {logCommand_lis,"list",logComLis}
 };
 
-
-
-
 static int zFind(void *notUse,int argc,char** argv,char** azColName)
 {
 	int *tmp = (int*)notUse;
@@ -308,6 +306,12 @@ void logThread()
 		{
 			if(!strcmp(a[0],loginCom[i].commandStr))
 			{
+				if (checkPass(loginCom[i].commandStr))
+				{
+					printf("you have no power to act this command!\n");
+					fprintf(stderr, ">>");
+					break;
+				}
 				loginCom[i].p(a);
 			}
 		}
@@ -371,6 +375,29 @@ quit:
 	pthread_join(id,NULL);
 }
 
+
+//获得当前账户的登记
+static int getLevel(void *notUse, int argc, char** argv, char** azColName)
+{
+	char *p = (char*)notUse;
+	strcpy(p, argv[2]);
+	return 0;
+}
+
+static int getLevelID(void *notUse, int argc, char** argv, char** azColName)
+{
+	int *tmp = (int *)notUse;
+	*tmp = atoi(argv[0]);
+	return 0;
+}
+
+static int getAbility(void *notUse, int argc, char** argv, char** azColName)
+{
+	Ability *p = (Ability*)notUse;
+	strcpy(p->ability[p->count], argv[2]);
+	p->count++;
+	return 0;
+}
 //函数功能：检查当前登录账户是否有权限使用输入的命令
 //参数command:输入参数，被检查的命令字符串
 //返回值
@@ -378,5 +405,65 @@ quit:
 //			1:当前用户无权执行该命令字
 int checkPass(char * command)
 {
+	Ability currentA;
+	memset(&currentA, 0, sizeof(currentA));
+	//通过用户名查到登记id
+	sqlite3 *db;
+	char * zerrmsg;
+	char tmpSql[LOGIN_MAX_SIZE];
+	int rc;
+	rc = sqlite3_open(db_path, &db);
+	int id = 0;
+	if (rc != 0)
+	{
+		printf("can't open %s \n", db_path);
+		return 1;
+	}
+	memset(tmpSql, 0, LOGIN_MAX_SIZE);
+	sprintf(tmpSql,"select * from User where uName='%s';",g_Account.userName);
+	rc=sqlite3_exec(db, tmpSql,getLevel, (void*)g_Account.level, &zerrmsg);
+	if (rc != SQLITE_OK)
+	{
+		printf("sqlite error:%s\n", zerrmsg);
+		sqlite3_free(zerrmsg);
+	}
+	//printf("g_Account.level=%s\n", g_Account.level);
+	memset(tmpSql, 0, LOGIN_MAX_SIZE);
+	sprintf(tmpSql, "select * from Level where lLevel='%s';", g_Account.level);
+	rc=sqlite3_exec(db, tmpSql, getLevelID, (void*)&id, &zerrmsg);
+	if (rc != SQLITE_OK)
+	{
+		printf("sqlite error:%s\n", zerrmsg);
+		sqlite3_free(zerrmsg);
+	}
+	printf("g_Account.level_id=%d\n", id);
 
+	/////////////////////////////////////
+	//通过登记id找权限：level id->ability id->ability
+	memset(tmpSql, 0, LOGIN_MAX_SIZE);
+	sprintf(tmpSql, "select rlLevel,raPower,aPower from Relation inner join Ability on Relation.raPower=Ability.aId where rlLevel=%d;",id);
+	rc=sqlite3_exec(db, tmpSql, getAbility, (void*)&currentA, &zerrmsg);
+	if (rc != SQLITE_OK)
+	{
+		printf("sqlite error:%s\n", zerrmsg);
+		sqlite3_free(zerrmsg);
+	}
+	sqlite3_close(db);
+	//根据当前用户权限，判断命令字是或否可执行
+	int i,j;
+	for ( i = 0; i <sizeof(relation)/sizeof(Relation); i++)
+	{
+		if (0 == strcmp(command, relation[i].comStr))
+		{
+			for (j = 0; j < currentA.count; j++)
+			{
+				if (0 == strcmp(relation[i].abiStr, currentA.ability[j]))
+				{
+					return 0;
+				}
+			}
+			break;
+		}
+	}
+	return 1;
 }

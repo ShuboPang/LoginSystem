@@ -328,7 +328,14 @@ void zzThread(void* para)
 		{
 			if(0 == strcmp(a[0],sys_Command[i].commandStr))
 			{
-				sys_Command[i].p(pFileInfo,a);
+				if (checkPass(sys_Command[i].commandStr))
+				{
+					printMessage(3);
+					printMessage(0);
+					break;
+				}
+				else
+					sys_Command[i].p(pFileInfo,a);
 				break;
 			}
 		}
