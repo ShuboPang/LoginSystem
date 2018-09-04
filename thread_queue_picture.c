@@ -67,6 +67,7 @@ enum sysCommand
 	command_turnover,
 	command_turnV,
 	command_turnH,
+	command_about,
 	command_max
 };
 
@@ -152,6 +153,14 @@ void Command_Rect(FileInfo* pFileInfo,char pCommandList[MAX_SIZE][MAX_SIZE])
 	}	
 }
 
+void Command_About(FileInfo* pFileInfo, char pCommandList[MAX_SIZE][MAX_SIZE])
+{
+	printf("\t	<system Version v1.0.0.0>\n");
+	printf("\t	<copyright: Oliver>\n");
+	printf("\t	<adress: JiLin City>\n");
+	printMessage(0);
+}
+
 
 const SystemCommand sys_Command[]={
 	{command_circl,"circl",Command_Circl},
@@ -163,6 +172,7 @@ const SystemCommand sys_Command[]={
 	{command_turnover,"turnover"},
 	{command_turnV,"turnV"},
 	{command_turnH,"turnH"},
+	{command_about,"about",Command_About},
 	//{command_quit,"quit"}
 	};
 

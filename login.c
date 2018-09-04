@@ -30,20 +30,20 @@ typedef struct
 	void (*p)(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE]);
 }LoginCommand;
 
+
+
 const char db_path[]={"userLog.db"};
-int found=0;
-int maxId=0;
+
+
+
 static SqQueue *g_pLogQueue;
+
+
 
 static int zMaxId(void *notUse,int argc,char** argv,char** azColName)
 {
-	maxId=atoi(argv[0]);
-	return 0;
-}
-
-static int zList(void *notUse, int argc, char** argv, char** azColName)
-{
-	printf("%-10d  %-10s  %-10s  %-10s\n", atoi(argv[0]), argv[1], argv[2], argv[3]);
+	int *tmp = (int*)notUse;
+	*tmp=atoi(argv[0]);
 	return 0;
 }
 
@@ -51,6 +51,7 @@ void logComAdd(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE])
 {
 	sqlite3 *db;
 	char * zerrmsg;
+	int maxId=0;
 	char tmpSql[LOGIN_MAX_SIZE];
 	int rc;
 	rc=sqlite3_open(db_path,&db);
@@ -61,8 +62,9 @@ void logComAdd(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE])
 	}
 	//obtain exist max uID
 	memset(tmpSql,0,LOGIN_MAX_SIZE);
-	strcpy(tmpSql,"select * from User order by uId desc limit 1;");
-	rc=sqlite3_exec(db,tmpSql,zMaxId,NULL,&zerrmsg);
+	strcpy(tmpSql,
+		"select * from User order by uId desc limit 1;");
+	rc=sqlite3_exec(db,tmpSql,zMaxId,(void*)&maxId,&zerrmsg);
 	if(rc!=SQLITE_OK)
 	{
 		printf("sqlite error:%s\n",zerrmsg);
@@ -70,7 +72,10 @@ void logComAdd(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE])
 	}
 	//add user record
 	memset(tmpSql,0,LOGIN_MAX_SIZE);
-	sprintf(tmpSql,"insert into User values(%d,'%s','%s','%s');",maxId+1,pCommandBlock[1],pCommandBlock[2],pCommandBlock[3]);
+	sprintf(tmpSql,
+		"insert into User values(%d,'%s','%s','%s');",
+		maxId+1,pCommandBlock[1],pCommandBlock[2],
+		pCommandBlock[3]);
 	rc=sqlite3_exec(db,tmpSql,NULL,NULL,&zerrmsg);
 	if(rc!=SQLITE_OK)
 	{
@@ -86,18 +91,22 @@ void logComDel(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE])
 	char * zerrmsg;
 	char tmpSql[LOGIN_MAX_SIZE];
 	int rc;
-	rc = sqlite3_open(db_path, &db);
-	if (rc != 0)
+	rc=sqlite3_open(db_path,&db);
+	if(rc!=0)
 	{
-		printf("can't open %s \n", db_path);
+		printf("can't open %s \n",db_path);
 		return;
 	}
-	memset(tmpSql, 0, LOGIN_MAX_SIZE);
-	sprintf(tmpSql, "delete from User where uName='%s';",pCommandBlock[1]);
-	rc = sqlite3_exec(db, tmpSql, NULL, NULL, &zerrmsg);
-	if (rc != SQLITE_OK)
+	//delete the account
+	memset(tmpSql,0,LOGIN_MAX_SIZE);
+	sprintf(tmpSql,
+		"delete from User where uName='%s';",
+		pCommandBlock[1]);
+	printf("tmpSql=%s \n",tmpSql);
+	rc=sqlite3_exec(db,tmpSql,NULL,NULL,&zerrmsg);
+	if(rc!=SQLITE_OK)
 	{
-		printf("sqlite error:%s\n", zerrmsg);
+		printf("sqlite error:%s\n",zerrmsg);
 		sqlite3_free(zerrmsg);
 	}
 	sqlite3_close(db);
@@ -109,60 +118,87 @@ void logComChg(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE])
 	char * zerrmsg;
 	char tmpSql[LOGIN_MAX_SIZE];
 	int rc;
-	rc = sqlite3_open(db_path, &db);
-	if (rc != 0)
+	rc=sqlite3_open(db_path,&db);
+	if(rc!=0)
 	{
-		printf("can't open %s \n", db_path);
+		printf("can't open %s \n",db_path);
 		return;
 	}
-	memset(tmpSql, 0, LOGIN_MAX_SIZE);
-	sprintf(tmpSql, "update User set uPassword='%s' where uName='%s'and uPassword='%s';", pCommandBlock[3], pCommandBlock[1], pCommandBlock[2]);
-	rc = sqlite3_exec(db, tmpSql, NULL, NULL, &zerrmsg);
-	if (rc != SQLITE_OK)
+	//change the account
+	memset(tmpSql,0,LOGIN_MAX_SIZE);
+	sprintf(tmpSql,
+"update User set uLevel='%s',uPassword='%s' where uName='%s';",
+		pCommandBlock[2],pCommandBlock[3],
+		pCommandBlock[1]);
+	rc=sqlite3_exec(db,tmpSql,NULL,NULL,&zerrmsg);
+	if(rc!=SQLITE_OK)
 	{
-		printf("sqlite error:%s\n", zerrmsg);
+		printf("sqlite error:%s\n",zerrmsg);
 		sqlite3_free(zerrmsg);
 	}
 	sqlite3_close(db);
 }
+static int displayList(void *notUse,int argc,char** argv,char** azColName)
+{
+	int i;
+	int*flag = (int*)notUse;
+	if(0==*flag)
+	{
+		for(i=0;i<argc;i++)
+		{
+			printf("%s\t",azColName[i]);
+		}
+		*flag=1;
+		printf("\n");
+	}
+	
+	for(i=0;i<argc;i++)
+	{
+		printf("%s\t",argv[i]);
+	}
+	printf("\n");
+	return 0;
+}
 
-void logComList(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE])
+void logComLis(char pCommandBlock[LOGIN_MIN_SIZE][LOGIN_MIN_SIZE])
 {
 	sqlite3 *db;
 	char * zerrmsg;
+	int flag=0;
 	char tmpSql[LOGIN_MAX_SIZE];
 	int rc;
-	rc = sqlite3_open(db_path, &db);
-	if (rc != 0)
+	rc=sqlite3_open(db_path,&db);
+	if(rc!=0)
 	{
-		printf("can't open %s \n", db_path);
+		printf("can't open %s \n",db_path);
 		return;
 	}
-	memset(tmpSql, 0, LOGIN_MAX_SIZE);
-	strcpy(tmpSql, "select * from User");
-	printf("\nuId         uName       uLevel      uPassword\n");
-	printf("----------  ----------  ----------  ----------\n");
-	rc = sqlite3_exec(db, tmpSql, zList, NULL, &zerrmsg);
-	if (rc != SQLITE_OK)
+	//change the account
+	memset(tmpSql,0,LOGIN_MAX_SIZE);
+	strcpy(tmpSql,"select * from User;");
+	rc=sqlite3_exec(db,tmpSql,displayList,(void*)&flag,&zerrmsg);
+	if(rc!=SQLITE_OK)
 	{
-		printf("sqlite error:%s\n", zerrmsg);
+		printf("sqlite error:%s\n",zerrmsg);
 		sqlite3_free(zerrmsg);
 	}
 	sqlite3_close(db);
 }
 
-
 const LoginCommand loginCom[]={
-	{logCommand_add,"add",logComAdd},
-	{logCommand_del,"del",logComDel},
-	{logCommand_chg,"chg",logComChg },
-	{logCommand_lis,"list",logComList}
+{logCommand_add,"add",logComAdd},
+{logCommand_del,"del",logComDel},
+{logCommand_chg,"chg",logComChg},
+{logCommand_lis,"list",logComLis}
 };
+
+
 
 
 static int zFind(void *notUse,int argc,char** argv,char** azColName)
 {
-	found=1;
+	int *tmp = (int*)notUse;
+	*tmp = 1;
 	return 0;
 }
 
@@ -171,7 +207,7 @@ int checkUser()
 	int i;
 	sqlite3 *db;
 	char * zerrmsg;
-	
+	int found=0;
 	Account tmpAccount;
 	char tmpSql[LOGIN_MAX_SIZE];
 
@@ -195,10 +231,10 @@ int checkUser()
 "select * from User where uName='%s' and uPassword = '%s';",
 tmpAccount.userName,tmpAccount.passWord);
 		
-		sqlite3_exec(db,tmpSql,zFind,NULL,&zerrmsg);
+		sqlite3_exec(db,tmpSql,zFind,(void*)(&found),&zerrmsg);
+		
 		if(1==found)
 		{
-			found=0;
 			sqlite3_close(db);
 			return 0;
 		}
@@ -245,9 +281,9 @@ void logThread()
 		}
 		//out queue
 		memset(&message,0,sizeof(message));
-		memset(a, 0, sizeof(a));
 		out_CirQueue(g_pLogQueue,&message);
 		//parse and act
+		memset(a,0,sizeof(a));
 		gmz_depart(message.command,a);
 
 		for(i=0;i<logCommand_max;i++)
@@ -255,7 +291,6 @@ void logThread()
 			if(!strcmp(a[0],loginCom[i].commandStr))
 			{
 				loginCom[i].p(a);
-				continue;
 			}
 		}
 	}
@@ -289,7 +324,6 @@ void accountConfig()
 		goto quit;
 	}
 	setbuf(stdin,NULL);
-	//flushStdin();
 	while(1)
 	{	
 		printf(">>");		
