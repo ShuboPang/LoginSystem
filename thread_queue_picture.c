@@ -11,28 +11,28 @@
 
 #define MAX_SIZE 256
 
-typedef struct tagBmpFileHeader //ÎÄ¼þÍ·  
+typedef struct tagBmpFileHeader //ï¿½Ä¼ï¿½Í·  
 {  
-    //unsigned short bfType;      //±êÊ¶¸ÃÎÄ¼þÎªbmpÎÄ¼þ,ÅÐ¶ÏÎÄ¼þÊÇ·ñÎªbmpÎÄ¼þ£¬¼´ÓÃ¸ÃÖµÓë"0x4d42"±È½ÏÊÇ·ñÏàµÈ¼´¿É£¬0x4d42 = 19778  
-    unsigned long  bfSize;      //ÎÄ¼þ´óÐ¡  
-    unsigned short bfReserved1; //Ô¤±£ÁôÎ»  
-    unsigned short bfReserved2; //Ô¤±£ÁôÎ»  
-    unsigned long  bfOffBits;   //Í¼ÏñÊý¾ÝÇøµÄÆðÊ¼Î»ÖÃ  
-}BmpFileHeader;//14×Ö½Ú  
-typedef struct tagBmpInfoHeader //ÐÅÏ¢Í·  
+    //unsigned short bfType;      //ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½Ä¼ï¿½Îªbmpï¿½Ä¼ï¿½,ï¿½Ð¶ï¿½ï¿½Ä¼ï¿½ï¿½Ç·ï¿½Îªbmpï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¸ï¿½Öµï¿½ï¿½"0x4d42"ï¿½È½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½È¼ï¿½ï¿½É£ï¿½0x4d42 = 19778  
+    unsigned long  bfSize;      //ï¿½Ä¼ï¿½ï¿½ï¿½Ð¡  
+    unsigned short bfReserved1; //Ô¤ï¿½ï¿½ï¿½ï¿½Î»  
+    unsigned short bfReserved2; //Ô¤ï¿½ï¿½ï¿½ï¿½Î»  
+    unsigned long  bfOffBits;   //Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼Î»ï¿½ï¿½  
+}BmpFileHeader;//14ï¿½Ö½ï¿½  
+typedef struct tagBmpInfoHeader //ï¿½ï¿½Ï¢Í·  
 {  
-    unsigned long  biSize;  //Í¼ÏñÊý¾Ý¿é´óÐ¡  
-    long     biWidth;   //¿í¶È  
-    long     biHeight;  //¸ß¶È  
+    unsigned long  biSize;  //Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½Ð¡  
+    long     biWidth;   //ï¿½ï¿½ï¿½  
+    long     biHeight;  //ï¿½ß¶ï¿½  
     unsigned short biPlanes;//Îª1  
-    unsigned short biBitCount; //ÏñËØÎ»Êý£¬8-»Ò¶ÈÍ¼£»24-Õæ²ÊÉ«  
-    unsigned long biCompression;//Ñ¹Ëõ·½Ê½  
-    unsigned long biSizeImage;  //Í¼ÏñÇøÊý¾Ý´óÐ¡  
-    long     biXPelsPerMeter;  //Ë®Æ½·Ö±æÂÊ£¬ÏñËØÃ¿Ã×  
+    unsigned short biBitCount; //ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½8-ï¿½Ò¶ï¿½Í¼ï¿½ï¿½24-ï¿½ï¿½ï¿½É«  
+    unsigned long biCompression;//Ñ¹ï¿½ï¿½ï¿½ï¿½Ê½  
+    unsigned long biSizeImage;  //Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½Ð¡  
+    long     biXPelsPerMeter;  //Ë®Æ½ï¿½Ö±ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½  
     long     biYPelsPerMeter;  
-    unsigned long biClrUsed;   //Î»Í¼Êµ¼ÊÓÃµ½µÄÑÕÉ«Êý  
-    unsigned short biClrImportant;//Î»Í¼ÏÔÊ¾¹ý³Ì£¬ÖØÒªµÄÑÕÉ«Êý£»0--ËùÓÐ¶¼ÖØÒª  
-}BmpInfoHeader;//40×Ö½Ú  
+    unsigned long biClrUsed;   //Î»Í¼Êµï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½  
+    unsigned short biClrImportant;//Î»Í¼ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ì£ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½0--ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½Òª  
+}BmpInfoHeader;//40ï¿½Ö½ï¿½  
 
 typedef struct
 {

@@ -1,8 +1,13 @@
+cflags=-lpthread -lsqlite3 -I queue -I login
+
 all:thread_queue_picture thread_picture normal_picture pfun
 
 thread_queue_picture:thread_queue_picture.o queue.o login.o 
-	gcc $^ -o $@  -lpthread -lsqlite3
+	gcc $^ -o $@  $(cflags)
 
+thread_queue_picture.o:thread_queue_picture.c
+	gcc  -c $^  $(cflags)
+	
 thread_picture:thread_picture.o
 	gcc $^ -o $@  -lpthread
 
