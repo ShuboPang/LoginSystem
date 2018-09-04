@@ -14,6 +14,25 @@
 
 #define ERROR_TIME 3
 
+Account g_Account;
+
+typedef struct 
+{
+	char comStr[LOGIN_MIN_SIZE];
+	char abiStr[LOGIN_MIN_SIZE];
+}Relation;
+
+Relation relation[] = {
+	{"about","list"},
+	{"rect","read"},
+	{"circl","read"},
+	{"Account","write"},
+	{"chg","write"},
+	{"add","create"},
+	{"del","delete"},
+	{"q","list"},
+};
+
 enum logCommand
 {
 	logCommand_add,
@@ -208,15 +227,14 @@ int checkUser()
 	sqlite3 *db;
 	char * zerrmsg;
 	int found=0;
-	Account tmpAccount;
 	char tmpSql[LOGIN_MAX_SIZE];
 
 	for(i=0;i<ERROR_TIME;i++)
 	{
 		printf("please input user name:");
-		gets(tmpAccount.userName);
+		gets(g_Account.userName);
 		printf("please input password:");
-		gets(tmpAccount.passWord);
+		gets(g_Account.passWord);
 
 		//在数据库中user表内，查找用户输入的用户名和密码
 		int rc;
@@ -229,7 +247,7 @@ int checkUser()
 		memset(tmpSql,0,LOGIN_MAX_SIZE);
 		sprintf(tmpSql,
 "select * from User where uName='%s' and uPassword = '%s';",
-tmpAccount.userName,tmpAccount.passWord);
+g_Account.userName,g_Account.passWord);
 		
 		sqlite3_exec(db,tmpSql,zFind,(void*)(&found),&zerrmsg);
 		
@@ -351,4 +369,14 @@ void accountConfig()
 quit:
 	pthread_cancel(id);
 	pthread_join(id,NULL);
+}
+
+//函数功能：检查当前登录账户是否有权限使用输入的命令
+//参数command:输入参数，被检查的命令字符串
+//返回值
+//			0:当前用户有权执行该命令字
+//			1:当前用户无权执行该命令字
+int checkPass(char * command)
+{
+
 }

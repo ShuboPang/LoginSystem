@@ -207,6 +207,10 @@ void printMessage(int number)
 	{
 		printf("\nplease input resolution:");
 	}
+	else if (3==number)
+	{
+		printf("\nyou have no power to act this command!\n");
+	}
 	else
 	{
 		printf("\nprint message parameter error!\n");
@@ -392,6 +396,12 @@ void main()
 		}
 		else if(!strcmp(command,"Account"))
 		{
+			ret = checkPass(command);
+			if (ret)
+			{
+				printMessage(3);
+				continue;
+			}
 			//account control
 			accountConfig();
 			continue;
