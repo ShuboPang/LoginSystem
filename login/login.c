@@ -234,7 +234,7 @@ int checkUser()
 		printf("please input password:");
 		gets(g_Account.passWord);
 
-		//ÔÚÊý¾Ý¿âÖÐuser±íÄÚ£¬²éÕÒÓÃ»§ÊäÈëµÄÓÃ»§ÃûºÍÃÜÂë
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½userï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		int rc;
 		rc=sqlite3_open(db_path,&db);
 		if(rc!=0)
@@ -324,21 +324,21 @@ void accountConfig()
 	char tmpCommand[LOGIN_MAX_SIZE]={0};
 	ElemType message;
 	int ret,i=0;
-	//´´½¨×ÓÏß³Ì
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
 	pthread_t id;
 	pthread_attr_t attr;
-	//Ïß³ÌÊôÐÔ³õÊ¼»¯
+	//ï¿½ß³ï¿½ï¿½ï¿½ï¿½Ô³ï¿½Ê¼ï¿½ï¿½
 	pthread_attr_init(&attr);
-	//ÉèÖÃ°ó¶¨ÊôÐÔ
+	//ï¿½ï¿½ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½
 	pthread_attr_setscope(&attr,PTHREAD_SCOPE_SYSTEM);
-	//´´½¨Ïß³Ì
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
 	ret=pthread_create(&id,&attr,(void*)logThread,NULL);
 	if(-1 == ret)
 	{
 		printf("thread create failure,Account control quit!\n");
 		return;
 	}
-	//´´½¨¶ÓÁÐ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	g_pLogQueue=init_CirQueue();
 	if(NULL == g_pLogQueue)
 	{
@@ -355,7 +355,7 @@ void accountConfig()
 		{
 			break;
 		}
-		//Èë¶Ó
+		//ï¿½ï¿½ï¿½
 		message.commandID = i++;
 		memset(message.command,0,sizeof(message.command));
 		strcpy(message.command,tmpCommand);
@@ -376,7 +376,7 @@ quit:
 }
 
 
-//»ñµÃµ±Ç°ÕË»§µÄµÇ¼Ç
+//ï¿½ï¿½Ãµï¿½Ç°ï¿½Ë»ï¿½ï¿½ÄµÇ¼ï¿½
 static int getLevel(void *notUse, int argc, char** argv, char** azColName)
 {
 	char *p = (char*)notUse;
@@ -398,16 +398,16 @@ static int getAbility(void *notUse, int argc, char** argv, char** azColName)
 	p->count++;
 	return 0;
 }
-//º¯Êý¹¦ÄÜ£º¼ì²éµ±Ç°µÇÂ¼ÕË»§ÊÇ·ñÓÐÈ¨ÏÞÊ¹ÓÃÊäÈëµÄÃüÁî
-//²ÎÊýcommand:ÊäÈë²ÎÊý£¬±»¼ì²éµÄÃüÁî×Ö·û´®
-//·µ»ØÖµ
-//			0:µ±Ç°ÓÃ»§ÓÐÈ¨Ö´ÐÐ¸ÃÃüÁî×Ö
-//			1:µ±Ç°ÓÃ»§ÎÞÈ¨Ö´ÐÐ¸ÃÃüÁî×Ö
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½éµ±Ç°ï¿½ï¿½Â¼ï¿½Ë»ï¿½ï¿½Ç·ï¿½ï¿½ï¿½È¨ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+//ï¿½ï¿½ï¿½ï¿½command:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
+//ï¿½ï¿½ï¿½ï¿½Öµ
+//			0:ï¿½ï¿½Ç°ï¿½Ã»ï¿½ï¿½ï¿½È¨Ö´ï¿½Ð¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+//			1:ï¿½ï¿½Ç°ï¿½Ã»ï¿½ï¿½ï¿½È¨Ö´ï¿½Ð¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 int checkPass(char * command)
 {
 	Ability currentA;
 	memset(&currentA, 0, sizeof(currentA));
-	//Í¨¹ýÓÃ»§Ãû²éµ½µÇ¼Çid
+	//Í¨ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½éµ½ï¿½Ç¼ï¿½id
 	sqlite3 *db;
 	char * zerrmsg;
 	char tmpSql[LOGIN_MAX_SIZE];
@@ -439,7 +439,7 @@ int checkPass(char * command)
 	printf("g_Account.level_id=%d\n", id);
 
 	/////////////////////////////////////
-	//Í¨¹ýµÇ¼ÇidÕÒÈ¨ÏÞ£ºlevel id->ability id->ability
+	//Í¨ï¿½ï¿½ï¿½Ç¼ï¿½idï¿½ï¿½È¨ï¿½Þ£ï¿½level id->ability id->ability
 	memset(tmpSql, 0, LOGIN_MAX_SIZE);
 	sprintf(tmpSql, "select rlLevel,raPower,aPower from Relation inner join Ability on Relation.raPower=Ability.aId where rlLevel=%d;",id);
 	rc=sqlite3_exec(db, tmpSql, getAbility, (void*)&currentA, &zerrmsg);
@@ -449,7 +449,7 @@ int checkPass(char * command)
 		sqlite3_free(zerrmsg);
 	}
 	sqlite3_close(db);
-	//¸ù¾Ýµ±Ç°ÓÃ»§È¨ÏÞ£¬ÅÐ¶ÏÃüÁî×ÖÊÇ»ò·ñ¿ÉÖ´ÐÐ
+	//ï¿½ï¿½ï¿½Ýµï¿½Ç°ï¿½Ã»ï¿½È¨ï¿½Þ£ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½ï¿½Ö´ï¿½ï¿½
 	int i,j;
 	for ( i = 0; i <sizeof(relation)/sizeof(Relation); i++)
 	{
